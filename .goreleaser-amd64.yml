@@ -1,0 +1,30 @@
+version: 2
+
+# .goreleaser.yml
+project_name: bib-comms
+
+# Build
+builds:
+  - env: [CGO_ENABLED=1]
+    goos:
+      - linux
+    main: .
+    binary: bib-comms
+    goarch:
+      - amd64
+    ldflags:
+      - -s -w
+      - -X "main.Version=v{{ .Version }}"
+      - -X "main.GitCommit={{ .ShortCommit }}"
+      - -X "main.Timestamp={{ .Timestamp }}"
+    flags:
+      - -trimpath
+
+# Archive
+archives:
+  - name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format: "binary"
+
+# Checksums
+checksum:
+  disable: true
