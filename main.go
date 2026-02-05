@@ -62,6 +62,7 @@ func Connect(c *gumble.Config, addr string) {
 	client, err := GumbleDialInsecure(addr, c)
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 	slog.Info("Connected to the Mumble server", "address", addr, "username", c.Username)
 
@@ -103,6 +104,12 @@ func main() {
 			}
 			e.Client.Self.Move(ch)
 			slog.Info("Joined channel", "name", ch.Name)
+		},
+	})
+	gc.Attach(&gumbleutil.Listener{
+		Disconnect: func(e *gumble.DisconnectEvent) {
+			slog.Error("Disconnected from the server, exiting...")
+			os.Exit(1)
 		},
 	})
 	Connect(gc, c.MumbleAddress)
